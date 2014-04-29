@@ -2,10 +2,11 @@ package com.niuhp.corejava.pattern.observer;
 
 import java.util.Observer;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class ObserverTest extends TestCase {
+public class ObserverTest {
 
+	@Test
 	public void testObserver() {
 		NewsPaper np = new NewsPaper();
 

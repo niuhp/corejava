@@ -1,9 +1,10 @@
 package com.niuhp.corejava.pattern.state;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class StateTest extends TestCase {
+public class StateTest {
 
+	@Test
 	public void testState() {
 		ColorState cs = new RedState();
 

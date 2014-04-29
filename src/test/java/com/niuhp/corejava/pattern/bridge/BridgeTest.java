@@ -1,9 +1,10 @@
 package com.niuhp.corejava.pattern.bridge;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class BridgeTest extends TestCase {
+public class BridgeTest {
 
+	@Test
 	public void testBridge() {
 		DrinkSingleton.getInstance().setDrink(new DrinkImpl2());
 

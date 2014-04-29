@@ -1,9 +1,10 @@
 package com.niuhp.corejava.pattern.decorator;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class DecoratorTest extends TestCase {
+public class DecoratorTest {
 
+	@Test
 	public void testDecorator() {
 		Download d1 = new Download() {
 
