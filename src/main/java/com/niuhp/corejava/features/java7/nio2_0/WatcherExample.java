@@ -42,11 +42,11 @@ public class WatcherExample {
 		handleEvent(path, ws);
 	}
 
-	public static void main(String[] args) {
-		try {
-			watchPath("d:/temp");
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+//	public static void main(String[] args) {
+//		try {
+//			watchPath("d:/temp");
+//		} catch (IOException | InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//	}
 }
