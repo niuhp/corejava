@@ -1,8 +1,10 @@
 package com.niuhp.corejava.pattern.producer;
 
+import java.security.InvalidParameterException;
+
 public class Market {
 
-	private int max = 100;
+	private int max;
 
 	private int current;
 
@@ -10,10 +12,20 @@ public class Market {
 	}
 
 	public Market(int current) {
-		this.current = current;
+		this(500, current);
 	}
 
 	public Market(int max, int current) {
+		if(current<0){
+			throw new InvalidParameterException("current can 't be smaller than 0,current="+current);
+		}
+		
+		if(max<=0){
+			throw new InvalidParameterException("max can 't be smaller than 1,max="+max);
+		}		
+		if(current>max){
+			throw new InvalidParameterException("current can 't be lager than max,current="+current+",max="+max);
+		}
 		this.max = max;
 		this.current = current;
 	}

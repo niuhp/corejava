@@ -11,17 +11,13 @@ public class ProducerTest {
 
 		Clock clock = Clock.systemDefaultZone();
 
-		Market market = new Market(10, 150);
+		Market market = new Market(150, 10);
 
 		long t1 = clock.millis();
 		long t2 = clock.millis();
-		while (market.getCurrent() != 0 && (t2 - t1 < 20000)) {
+		while (t2 - t1 < 10000) {
 			Role c = new Consumer(market);
 			c.start();
-
-			if (market.getCurrent() == 0) {
-				break;
-			}
 
 			Role p = new Producer(market);
 			p.start();
