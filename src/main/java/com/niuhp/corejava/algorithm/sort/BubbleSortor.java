@@ -7,7 +7,7 @@ public class BubbleSortor extends Sortor {
 
 		for (int i = startIndex; i < endIndex; i++) {
 
-			for (int j = startIndex; j < endIndex + startIndex - i; j++) {
+			for (int j = startIndex; j <  endIndex + startIndex - i; j++) {
 				if (array[j] > array[j + 1]) {
 					int temp = array[j];
 					array[j] = array[j + 1];

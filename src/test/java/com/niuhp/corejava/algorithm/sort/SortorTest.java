@@ -21,4 +21,13 @@ public class SortorTest {
 		}
 
 	}
+	
+	@Test
+	public void BubbleSort() {
+		Sortor sortor=new BubbleSortor();
+		int[] array = ArrayUtil.contructArray(10);
+		ArrayUtil.printArray(array, 10);
+		sortor.sort(array, 3, 7);
+		ArrayUtil.printArray(array, 10);
+	}
 }
