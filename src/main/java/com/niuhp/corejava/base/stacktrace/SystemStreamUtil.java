@@ -6,47 +6,47 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-public class StackTraceUtil {
+public class SystemStreamUtil {
 
-	private StackTraceUtil() {
+	private SystemStreamUtil() {
 	}
 
-	public static void setErr(PrintStream err) {
+	public static void redirectErr(PrintStream err) {
 		System.setErr(err);
 	}
 
-	public static void setErr(File errFile) {
+	public static void redirectErr(File errFile) {
 		createFileIfNotExists(errFile);
 		try {
 			PrintStream err = new PrintStream(new FileOutputStream(errFile, true));
-			setErr(err);
+			redirectErr(err);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void setErr(String filePath) {
+	public static void redirectErr(String filePath) {
 		File file = new File(filePath);
-		setErr(file);
+		redirectErr(file);
 	}
 
-	public static void setOut(PrintStream out) {
+	public static void redirectOut(PrintStream out) {
 		System.setOut(out);
 	}
 
-	public static void setOut(File outFile) {
+	public static void redirectOut(File outFile) {
 		createFileIfNotExists(outFile);
 		try {
 			PrintStream out = new PrintStream(new FileOutputStream(outFile, true));
-			setOut(out);
+			redirectOut(out);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void setOut(String filePath) {
+	public static void redirectOut(String filePath) {
 		File file = new File(filePath);
-		setOut(file);
+		redirectOut(file);
 	}
 
 	private static void createFileIfNotExists(File file) {
