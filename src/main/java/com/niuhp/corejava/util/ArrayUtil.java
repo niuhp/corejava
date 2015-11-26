@@ -44,4 +44,8 @@ public class ArrayUtil {
 
 		return true;
 	}
+
+	public static <T extends Object> boolean isEmpty(T[] array) {
+		return array == null || array.length == 0;
+	}
 }
