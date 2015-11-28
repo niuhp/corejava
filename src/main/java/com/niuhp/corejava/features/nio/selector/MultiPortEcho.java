@@ -22,7 +22,6 @@ import java.util.Set;
 public class MultiPortEcho {
 
 	private int[] ports;
-	private final ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
 
 	public MultiPortEcho() {
 
@@ -32,58 +31,76 @@ public class MultiPortEcho {
 		this.ports = ports;
 	}
 
-	public void startup1() throws IOException {
+	public void startup() throws IOException {
 		if (ports == null || ports.length == 0) {
 			System.out.println("ports is empty!");
 			return;
 		}
 		Selector selector = Selector.open();
-		for (int i = 0; i < ports.length; ++i) {
-			ServerSocketChannel serverChannel = ServerSocketChannel.open();
-			serverChannel.configureBlocking(false);
-			ServerSocket ss = serverChannel.socket();
-			InetSocketAddress address = new InetSocketAddress(ports[i]);
-			ss.bind(address);
-			SelectionKey key = serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-			System.out.println("Going to listen on " + ports[i] + " with interestOps=" + key.interestOps());
+		for (int i = 0; i < ports.length; i++) {
+			registerAcceptKey(selector, ports[i]);
 		}
-
 		while (true) {
-			int num = selector.select();
-			System.out.println("selector.select is " + num);
+			selector.select();
 			Set<SelectionKey> selectedKeys = selector.selectedKeys();
 			Iterator<SelectionKey> it = selectedKeys.iterator();
 			while (it.hasNext()) {
-				SelectionKey key = (SelectionKey) it.next();
-				if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT) {
-					// Accept the new connection
-					ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
-					SocketChannel sc = ssc.accept();
-					sc.configureBlocking(false);
-					// Add the new connection to the selector
-					SelectionKey newKey = sc.register(selector, SelectionKey.OP_READ);
-					it.remove();
-					System.out.println("Got connection from " + sc + " with key=" + newKey);
-				} else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
-					// Read the data
-					SocketChannel sc = (SocketChannel) key.channel();
-					// Echo data
-					int bytesEchoed = 0;
-					while (true) {
-						byteBuffer.clear();
-
-						int number_of_bytes = sc.read(byteBuffer);
-						if (number_of_bytes <= 0) {
-							break;
-						}
-						byteBuffer.flip();
-						sc.write(byteBuffer);
-						bytesEchoed += number_of_bytes;
-					}
-					System.out.println("Echoed " + bytesEchoed + " from " + sc);
-					it.remove();
+				SelectionKey selectionKey = it.next();
+				if (selectionKey.isAcceptable()) {
+					ServerSocketChannel serverSocketChannel = (ServerSocketChannel) selectionKey
+							.channel();
+					registerReadKey(selector, serverSocketChannel);
+				} else if (selectionKey.isReadable()) {
+					SocketChannel socketChannel = (SocketChannel) selectionKey
+							.channel();
+					processSocketChannel(socketChannel);
 				}
+				it.remove();
 			}
 		}
+
+	}
+
+	private static void registerAcceptKey(Selector selector, int port)
+			throws IOException {
+		ServerSocketChannel serverChannel = ServerSocketChannel.open();
+		serverChannel.configureBlocking(false);
+		ServerSocket serverSocket = serverChannel.socket();
+		InetSocketAddress address = new InetSocketAddress(port);
+		serverSocket.bind(address);
+		serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+		System.out.println("starting to listen on " + port);
+	}
+
+	private static void registerReadKey(Selector selector,
+			ServerSocketChannel serverSocketChannel) throws IOException {
+		SocketChannel socketChannel = serverSocketChannel.accept();
+		socketChannel.configureBlocking(false);
+		socketChannel.register(selector, SelectionKey.OP_READ);
+		System.out.println("register OP_READ on " + serverSocketChannel);
+	}
+
+	private void processSocketChannel(SocketChannel socketChannel)
+			throws IOException {
+		ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+		int len = -1;
+		while (true) {
+			len = socketChannel.read(byteBuffer);
+			if (len <= 0) {
+//				socketChannel.close();
+//				System.out.println("read empty bytes,socketChannel["
+//						+ socketChannel + "] will be close");
+			} else {
+				byteBuffer.flip();
+				String msg = new String(byteBuffer.array(), 0, len);
+				System.out.print(msg);
+				byteBuffer.clear();
+//				String resMsg = String.format("%s收到消息%s", Thread
+//						.currentThread().getName(), msg);
+//				ByteBuffer buffer = ByteBuffer.wrap(resMsg.getBytes("GBK"));
+//				socketChannel.write(buffer);
+			}
+		}
+
 	}
 }

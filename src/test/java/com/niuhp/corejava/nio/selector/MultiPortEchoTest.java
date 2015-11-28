@@ -19,6 +19,6 @@ public class MultiPortEchoTest {
 	@Test
 	public void testStartup() throws IOException {
 		MultiPortEcho mp = new MultiPortEcho(new int[] { 5801, 5802, 5803 });
-		mp.startup1();
+		mp.startup();
 	}
 }
