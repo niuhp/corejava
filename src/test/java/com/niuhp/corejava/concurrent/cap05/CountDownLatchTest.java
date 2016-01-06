@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
@@ -20,25 +19,32 @@ public class CountDownLatchTest {
 
 	@Test
 	public void testCountDownLatch() throws InterruptedException {
-		AtomicInteger step = new AtomicInteger();
 
-		CountDownLatch latch = new CountDownLatch(1);
-		new Thread() {
+		int count = 10;
+
+		CountDownLatch latch = new CountDownLatch(count);
+		Random ran = new Random();
+		Runnable r = new Runnable() {
+
+			@Override
 			public void run() {
 				try {
-					latch.await();
+					Thread.sleep(ran.nextInt(5000));
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				System.out.println("--->process step:" + step.incrementAndGet());
-			};
-		}.start();
+				System.out.println(Thread.currentThread().getName() + " complete");
+				latch.countDown();
 
-		Thread.sleep(3000);
-		System.out.println("process step:" + step.incrementAndGet());
-		Thread.sleep(3000);
-		latch.countDown();
-		Thread.sleep(3000);
+			}
+		};
+
+		for (int i = 0; i < count; i++) {
+			new Thread(r).start();
+		}
+		System.out.println("----start wait---------");
+		latch.await();
+		System.out.println("----complete-----------");
 	}
 
 	@Test
