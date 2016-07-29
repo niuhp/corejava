@@ -1,4 +1,4 @@
-package com.niuhp.corejava.concurrent.thradscalc;
+package com.niuhp.corejava.concurrent.threadscalc;
 
 import java.io.BufferedReader;
 import java.io.IOException;

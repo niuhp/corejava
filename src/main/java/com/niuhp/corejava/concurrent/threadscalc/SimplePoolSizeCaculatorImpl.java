@@ -1,4 +1,4 @@
-package com.niuhp.corejava.concurrent.thradscalc;
+package com.niuhp.corejava.concurrent.threadscalc;
 
 import java.lang.management.ManagementFactory;
 import java.math.BigDecimal;

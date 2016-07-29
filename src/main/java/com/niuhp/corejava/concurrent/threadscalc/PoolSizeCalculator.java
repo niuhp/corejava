@@ -1,4 +1,4 @@
-package com.niuhp.corejava.concurrent.thradscalc;
+package com.niuhp.corejava.concurrent.threadscalc;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
