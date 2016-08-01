@@ -62,7 +62,7 @@ public class ThreadPoolCalculaor {
     runTask(task);
     cpuComputeTime = getCurrentThreadCpuTime() - cpuTime;
     cpuElapsedTime = testTimeMills * 1000000;
-    cpuWaitTime = cpuElapsedTime - cpuTime;
+    cpuWaitTime = cpuElapsedTime - cpuComputeTime;
     processors = Runtime.getRuntime().availableProcessors();
     threadsCount = new BigDecimal(processors).multiply(
             new BigDecimal(targetUtilization).add(
