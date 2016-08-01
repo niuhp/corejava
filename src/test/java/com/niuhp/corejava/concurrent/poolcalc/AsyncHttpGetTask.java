@@ -1,4 +1,4 @@
-package com.niuhp.corejava.concurrent.threadscalc;
+package com.niuhp.corejava.concurrent.poolcalc;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,23 +7,27 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by niuhaipeng on 2016/7/22.
+ * Created by niuhaipeng on 2016/7/29.
  */
-public class AsyncIOTask implements Runnable {
+public class AsyncHttpGetTask implements Runnable {
+  private String url;
+
+  public AsyncHttpGetTask(String url) {
+    this.url = url;
+  }
+
   @Override
   public void run() {
     HttpURLConnection connection = null;
     BufferedReader reader = null;
     try {
-      String getURL = "http://baidu.com";
-      URL getUrl = new URL(getURL);
+      URL getUrl = new URL(url);
       connection = (HttpURLConnection) getUrl.openConnection();
       connection.connect();
       reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
       String line;
-
       while ((line = reader.readLine()) != null) {
-        // empty loop
+       // System.out.println(line);
       }
     } catch (IOException e) {
 
@@ -38,4 +42,3 @@ public class AsyncIOTask implements Runnable {
     }
   }
 }
-

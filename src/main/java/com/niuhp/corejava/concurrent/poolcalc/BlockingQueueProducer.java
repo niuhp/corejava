@@ -1,4 +1,4 @@
-package com.niuhp.corejava.concurrent;
+package com.niuhp.corejava.concurrent.poolcalc;
 
 import java.util.concurrent.BlockingQueue;
 

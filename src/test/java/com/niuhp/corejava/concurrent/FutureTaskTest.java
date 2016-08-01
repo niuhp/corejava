@@ -17,10 +17,10 @@ import java.util.concurrent.TimeoutException;
 public class FutureTaskTest {
   @Test
   public void testTimeout() {
-    RandomSleepTask task = new RandomSleepTask(2000);
+    RandomSleepTask task = new RandomSleepTask(20000);
     ExecutorService executorService = Executors.newFixedThreadPool(5);
 
-    int total = 10;
+    int total = 5;
     List<FutureTask> taskList = new ArrayList<>();
     for (int i = 0; i < total; i++) {
       FutureTask futureTask = new FutureTask(task, null);

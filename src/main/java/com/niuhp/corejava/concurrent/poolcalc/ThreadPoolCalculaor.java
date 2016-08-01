@@ -1,4 +1,4 @@
-package com.niuhp.corejava.concurrent;
+package com.niuhp.corejava.concurrent.poolcalc;
 
 import java.lang.management.ManagementFactory;
 import java.math.BigDecimal;
@@ -6,6 +6,8 @@ import java.math.RoundingMode;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -17,7 +19,12 @@ public class ThreadPoolCalculaor {
   private long targetQueueBytes;
 
   private int testQueueSize = 1000;
-  private BlockingQueueProducer queueProducer;
+  private BlockingQueueProducer queueProducer = new BlockingQueueProducer() {
+    @Override
+    public BlockingQueue<Runnable> createWorkQueue() {
+      return new LinkedBlockingQueue<Runnable>(testQueueSize);
+    }
+  };
   private long testTimeMills = 3000;
   private long maxDiffMills = 20;
   private int maxTryCount = 10;
@@ -37,7 +44,7 @@ public class ThreadPoolCalculaor {
   }
 
   public ThreadPoolCalculaor(TaskProducer taskProducer, double targetUtilization) {
-    this(taskProducer, targetUtilization, 1024 * 1024 * 2);
+    this(taskProducer, targetUtilization, 1024 * 1024);
   }
 
   public ThreadPoolCalculaor(TaskProducer taskProducer, double targetUtilization, long targetQueueBytes) {
@@ -66,18 +73,24 @@ public class ThreadPoolCalculaor {
 
   public void displayResult() {
     StringBuilder resultBuilder = new StringBuilder();
-    resultBuilder.append("##########################################################")
+    resultBuilder.append("####################################################################################################################\n")
             .append("target queue memory usage:").append(targetQueueBytes).append(" bytes\n")
             .append("per task[").append(taskProducer.createTask().getClass().getName()).append("] usage:").append(usagePerTask).append(" bytes\n")
-            .append("recommended queue capacity:").append(targetQueueBytes).append("/").append(usagePerTask).append("=").append(queueCapacity).append("\n")
+            .append("===> recommended queue capacity:").append(targetQueueBytes).append("/").append(usagePerTask).append("=").append(queueCapacity).append("\n")
+            .append("---------------------------------------------------------------------------------------------------------------------\n")
             .append("number of processor:").append(processors).append("\n")
             .append("target utilization:").append(targetUtilization).append("\n")
             .append("cpu elapsed time:").append(cpuElapsedTime).append(" nanos\n")
             .append("cpu compute time:").append(cpuComputeTime).append(" nanos\n")
             .append("cpu wait time:").append(cpuWaitTime).append(" nanos\n")
-            .append("recommended threads count:").append(processors).append("*(")
+            .append("===> recommended threads count:").append(processors).append("*(")
             .append(targetUtilization).append("+(").append(cpuWaitTime).append("/").append(cpuComputeTime).append("))=")
-            .append(threadsCount).append("\n");
+            .append(threadsCount).append("\n")
+            .append("####################################################################################################################\n")
+            .append("you can create a thread poll like:\n")
+            .append("===> new ThreadPoolExecutor(").append(threadsCount).append(",").append(threadsCount)
+            .append(",0,TimeUnit.MILLISECONDS,new ").append(queueProducer.createWorkQueue().getClass().getSimpleName())
+            .append("<Runnable>(").append(queueCapacity).append("));\n");
     System.out.println(resultBuilder.toString());
   }
 
@@ -86,22 +99,18 @@ public class ThreadPoolCalculaor {
     for (int i = 0; i < testQueueSize; i++) {
       queue.add(taskProducer.createTask());
     }
-    long mem0 = getUsedMemory();
-    long mem1 = getUsedMemory();
+    long mem0 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+    long mem1 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     queue = null;
     callGarbageCollect(15);
-    mem0 = getUsedMemory();
+    mem0 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     queue = queueProducer.createWorkQueue();
     for (int i = 0; i < testQueueSize; i++) {
       queue.add(taskProducer.createTask());
     }
-    mem1 = getUsedMemory();
+    mem1 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     usagePerTask = (mem1 - mem0) / testQueueSize;
     queueCapacity = new BigDecimal(targetQueueBytes).divide(new BigDecimal(usagePerTask), RoundingMode.HALF_UP).intValue();
-  }
-
-  private long getUsedMemory() {
-    return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
   }
 
   private void callGarbageCollect(int times) {
@@ -146,4 +155,25 @@ public class ThreadPoolCalculaor {
   private long getCurrentThreadCpuTime() {
     return ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
   }
+
+  public void setTestQueueSize(int testQueueSize) {
+    this.testQueueSize = testQueueSize;
+  }
+
+  public void setQueueProducer(BlockingQueueProducer queueProducer) {
+    this.queueProducer = queueProducer;
+  }
+
+  public void setTestTimeMills(long testTimeMills) {
+    this.testTimeMills = testTimeMills;
+  }
+
+  public void setMaxDiffMills(long maxDiffMills) {
+    this.maxDiffMills = maxDiffMills;
+  }
+
+  public void setMaxTryCount(int maxTryCount) {
+    this.maxTryCount = maxTryCount;
+  }
+
 }
